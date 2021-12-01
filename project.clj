@@ -7,7 +7,8 @@
                  [org.postgresql/postgresql "42.3.1"]
                  [ring "1.9.4"]
                  [ring/ring-json "0.5.1"]
+                 [integrant "0.8.0"]
                  [com.github.seancorfield/next.jdbc "1.2.753"]]
-  :main uni-validations.core
+  :main uni-validations.main
   :resource-paths ["resources"]
   :repl-options {:init-ns uni-validations.core})
