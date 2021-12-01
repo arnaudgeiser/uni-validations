@@ -113,6 +113,12 @@ http://localhost:9876/
       },
       {
          "title":"Module 4 - Reconnaissance",
+         "reconnaissance":{
+            "id":3,
+            "type":"RECONNAISSANCE",
+            "grade":4.5,
+            "ects":5.0
+         },
          "validation":{
             "grade":5.0,
             "ects":15.0,
@@ -158,13 +164,7 @@ http://localhost:9876/
          ]
       },
       {
-         "title":"Module 6 - Reconnaissance",
-         "reconnaissance":{
-            "id":3,
-            "type":"RECONNAISSANCE",
-            "grade":4.5,
-            "ects":5.0
-         },
+         "title":"Module 6",
          "validation":{
             "grade":4.5,
             "ects":5.0,
