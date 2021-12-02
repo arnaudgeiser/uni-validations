@@ -2,61 +2,69 @@
   (:require [uni-validations.tree :refer [->tree]]))
 
 (defn make-reconnu
-  "Remove `:id` and `:parent` from the `etu-element`."
+  "Create an element `reconnu` by an EQUIVALENCE."
   [etu-element]
-  (dissoc etu-element :id :parent))
+  (select-keys etu-element [:title]))
 
 (defn make-reconnaissance
   "Create a reconnaissance according to its type:
   - `RECONNAISSANCE` and `DISPENSE` are handled the same way.
-  - `EQUIVALENCE` is supposed to replace another UE"
+  - `EQUIVALENCE` is supposed to replace another UE contains in the `reconnu` key"
   [reconnaissance etu-elements-by-id]
-  (let [reconnaissance' (dissoc reconnaissance
-                                :etu-element-id
-                                :etu-element-id-reconnu)]
+  (let [reconnaissance' (select-keys reconnaissance
+                                     [:grade
+                                      :ects
+                                      :etat-validation])]
+
+    ;; Consider it as a switch over the reconnaissance's type
     (condp = (:type reconnaissance)
-      "RECONNAISSANCE" reconnaissance'
-      "DISPENSE" reconnaissance'
+      "RECONNAISSANCE"
+      reconnaissance'
+      "DISPENSE"
+      reconnaissance'
       "EQUIVALENCE"
       (let [reconnu (:etu-element-id-reconnu reconnaissance)
             etu-element-reconnu (get etu-elements-by-id reconnu)]
         (assoc reconnaissance' :reconnu (make-reconnu etu-element-reconnu))))))
 
 (defn make-etu-element
-  "Remove `id`, `etu-element-id` and `parent` from the `etu-element`."
+  "Create an etu-element"
   [etu-element]
-  (dissoc etu-element :id :etu-element-id :parent))
+  (select-keys etu-element [:title]))
 
 (defn make-resultats
-  "Remove `etu-element-id` from the `resultats`."
+  "Create resultats"
   [resultats]
-  (map #(dissoc % :etu-element-id) resultats))
+  (map #(select-keys % [:tries :grades]) resultats))
 
 (defn make-validation
-  "Remove `etu-element-id` from the `validation`."
+  "Create a validation"
   [validation]
-  (dissoc validation :etu-element-id))
+  (select-keys validation [:grade :ects :etat-validation]))
 
 (defn remplace?
   "Return whether an `etu-element-id` is `REMPLACE`."
   [validations etu-element-id]
-  (let [validation (get validations etu-element-id)]
-    (= (:etat-validation validation) "REMPLACE")))
+  (let [validation (get validations etu-element-id)
+        etat-validation (:etat-validation validation)]
+    (= etat-validation "REMPLACE")))
 
 (defprotocol MesValidationsRepository
-  (find-etu-element [this])
+  "Protocol (interface) which defines
+  methods that need to be implemented by the SQL store."
+  (find-etu-elements [this])
   (find-resultats [this])
   (find-validations [this])
   (find-reconnaissances [this]))
 
 (defn mes-validations
   "Find validations as a tree with the resultats or the reconnaissance."
-  [mvr]
-  (let [etu-elements (find-etu-element mvr)
+  [repository]
+  (let [etu-elements (find-etu-elements repository)
         etu-elements-by-id (reduce #(assoc %1 (:id %2) %2) {} etu-elements)
-        resultats (find-resultats mvr)
-        validations (find-validations mvr)
-        reconnaissances (find-reconnaissances mvr)]
+        resultats (find-resultats repository)
+        validations (find-validations repository)
+        reconnaissances (find-reconnaissances repository)]
     (->tree etu-elements
             {;; Un élément REMPLACE ne doit pas être affiché dans l'arbre
              ;; étudiant

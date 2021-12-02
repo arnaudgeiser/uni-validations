@@ -29,7 +29,7 @@
 (def resultats-query (slurp-resource "resultats.sql"))
 (def reconnaissances-query (slurp-resource "reconnaissances.sql"))
 
-(defn find-etu-element
+(defn find-etu-elements
   "Find etu-elements."
   [execute-query]
   (execute-query tree-query))
@@ -53,8 +53,8 @@
 
 (defn make-mes-validations-repository [execute-query]
   (reify MesValidationsRepository
-    (find-etu-element [_]
-      (find-etu-element execute-query))
+    (find-etu-elements [_]
+      (find-etu-elements execute-query))
     (find-resultats [_]
       (find-resultats execute-query))
     (find-validations [_]
