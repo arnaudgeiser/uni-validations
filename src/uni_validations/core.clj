@@ -73,7 +73,7 @@
                           (let [resultats (get resultats id)
                                 reconnaissance (get reconnaissances id)
                                 validation (get validations id)]
-                            (-> (make-etu-element etu-element)
-                                (cond-> resultats (assoc :resultats (make-resultats resultats)))
-                                (cond-> reconnaissance (assoc :reconnaissance (make-reconnaissance reconnaissance etu-elements-by-id)))
-                                (cond-> validation (assoc :validation (make-validation validation))))))})))
+                            (cond-> (make-etu-element etu-element)
+                              resultats (assoc :resultats (make-resultats resultats))
+                              reconnaissance (assoc :reconnaissance (make-reconnaissance reconnaissance etu-elements-by-id))
+                              validation (assoc :validation (make-validation validation)))))})))
